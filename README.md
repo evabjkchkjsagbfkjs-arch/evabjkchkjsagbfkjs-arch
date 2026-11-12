@@ -23,4 +23,4 @@
 
 ### 📫 Контакты:
 - Telegram: [@твой_ник]
-- Email: [твоя_почта]
+- Email: [evgeniakazanina@yandex.ru]
