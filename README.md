@@ -1,16 +1,75 @@
-## Hi there 👋
+-- ============================================
+-- АНАЛИЗ ЭФФЕКТИВНОСТИ РЕКЛАМНЫХ КАНАЛОВ
+-- ============================================
+-- Бизнес-задача: Определить, какой рекламный канал
+-- приносит больше всего продаж и выручки
 
-<!--
-**evabjkchkjsagbfkjs-arch/evabjkchkjsagbfkjs-arch** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+-- Таблица: marketing_sales
+-- Колонки: 
+--   channel (канал рекламы: organic, paid_search, social, email)
+--   sale_amount (сумма продажи в рублях)
+--   sale_date (дата продажи)
+--   customer_id (ID клиента)
 
-Here are some ideas to get you started:
+-- ============================================
+-- ЗАПРОС 1: Общая выручка по каналам
+-- ============================================
+SELECT 
+    channel AS "Рекламный канал",
+    COUNT(*) AS "Количество продаж",
+    SUM(sale_amount) AS "Общая выручка (руб)",
+    ROUND(AVG(sale_amount), 2) AS "Средний чек (руб)"
+FROM marketing_sales
+GROUP BY channel
+ORDER BY "Общая выручка (руб)" DESC;
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+-- Что делает этот запрос:
+-- 1. Берем таблицу marketing_sales
+-- 2. Группируем данные по каналу рекламы (GROUP BY channel)
+-- 3. Для каждого канала считаем:
+--    - COUNT(*) = сколько всего продаж
+--    - SUM(sale_amount) = общая сумма выручки
+--    - AVG(sale_amount) = средний чек
+-- 4. Сортируем по убыванию выручки (ORDER BY DESC)
+-- Результат: видно, какой канал приносит больше денег
+
+
+-- ============================================
+-- ЗАПРОС 2: Продажи по месяцам
+-- ============================================
+SELECT 
+    channel AS "Рекламный канал",
+    EXTRACT(MONTH FROM sale_date) AS "Месяц",
+    COUNT(*) AS "Количество продаж",
+    SUM(sale_amount) AS "Выручка (руб)"
+FROM marketing_sales
+WHERE sale_date >= '2024-01-01'  -- Только данные с 2024 года
+GROUP BY channel, EXTRACT(MONTH FROM sale_date)
+ORDER BY "Рекламный канал", "Месяц";
+
+-- Что делает этот запрос:
+-- 1. Фильтруем данные: только продажи с 2024 года (WHERE)
+-- 2. Группируем по каналу И месяцу (GROUP BY channel, month)
+-- 3. EXTRACT(MONTH FROM sale_date) = вытаскиваем номер месяца из даты
+-- Результат: видно динамику продаж по каждому каналу по месяцам
+
+
+-- ============================================
+-- ЗАПРОС 3: Топ-5 клиентов по сумме покупок
+-- ============================================
+SELECT 
+    customer_id AS "ID клиента",
+    channel AS "Канал привлечения",
+    COUNT(*) AS "Количество покупок",
+    SUM(sale_amount) AS "Общая сумма (руб)"
+FROM marketing_sales
+GROUP BY customer_id, channel
+ORDER BY "Общая сумма (руб)" DESC
+LIMIT 5;  -- Показываем только топ-5
+
+-- Что делает этот запрос:
+-- 1. Группируем по клиенту И каналу
+-- 2. Считаем сколько раз покупал и на какую сумму
+-- 3. Сортируем по убыванию суммы
+-- 4. LIMIT 5 = берем только первые 5 строк
+-- Результат: видно, кто самые ценные клиенты и откуда они пришли
